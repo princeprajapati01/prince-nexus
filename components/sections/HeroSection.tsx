@@ -1,10 +1,13 @@
 "use client";
 
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { ArrowRight, Download, Calendar } from "lucide-react";
 import ParticleBackground from "@/components/ui/ParticleBackground";
+import ScheduleInterviewModal from "./ScheduleInterviewModal";
 
 const HeroSection = () => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
   return (
     <section id="hero" className="relative min-h-screen flex items-center justify-center overflow-hidden">
       {/* Particle Background */}
@@ -89,15 +92,13 @@ const HeroSection = () => {
               Download Resume
             </a>
 
-            <a
-              href="https://calendly.com/princeprajapati"
-              target="_blank"
-              rel="noopener noreferrer"
+            <button
+              onClick={() => setIsModalOpen(true)}
               className="px-8 py-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full hover:bg-white/20 transition-all duration-300 flex items-center gap-2 text-white font-medium hover:scale-105"
             >
               <Calendar size={20} />
               Schedule Interview
-            </a>
+            </button>
           </motion.div>
 
           {/* Scroll Indicator */}
@@ -117,6 +118,7 @@ const HeroSection = () => {
           </motion.div>
         </motion.div>
       </div>
+      <ScheduleInterviewModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
     </section>
   );
 };

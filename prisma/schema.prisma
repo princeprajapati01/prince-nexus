@@ -133,3 +133,18 @@ model Settings {
   value       String
   updatedAt   DateTime @updatedAt
 }
+
+model Interview {
+  id           String   @id @default(cuid())
+  name         String
+  email        String
+  company      String?
+  dateTime     DateTime
+  duration     Int      @default(30)
+  type         String
+  message      String?
+  status       String   @default("pending")
+  meetingLink  String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
