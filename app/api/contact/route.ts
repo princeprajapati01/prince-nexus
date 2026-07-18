@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { sendEmail } from '@/lib/email';
 
 export async function POST(request: NextRequest) {
   try {
@@ -30,6 +31,33 @@ export async function POST(request: NextRequest) {
         email,
         message,
       },
+    });
+
+    // Send email notification
+    await sendEmail({
+      subject: `✉️ New Portfolio Message from ${name}`,
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; rounded: 8px;">
+          <h2 style="color: #0ea5e9; border-bottom: 2px solid #0ea5e9; padding-bottom: 10px;">New Contact Form Message</h2>
+          <p>Hi Prince, you have received a new message from your portfolio website contact form.</p>
+          <table style="width: 100%; border-collapse: collapse; margin-top: 15px;">
+            <tr>
+              <td style="padding: 8px 0; font-weight: bold; width: 100px;">Name:</td>
+              <td style="padding: 8px 0;">${name}</td>
+            </tr>
+            <tr>
+              <td style="padding: 8px 0; font-weight: bold;">Email:</td>
+              <td style="padding: 8px 0;"><a href="mailto:${email}">${email}</a></td>
+            </tr>
+            <tr>
+              <td style="padding: 8px 0; font-weight: bold; vertical-align: top;">Message:</td>
+              <td style="padding: 8px 0; white-space: pre-line;">${message}</td>
+            </tr>
+          </table>
+          <hr style="border: 0; border-top: 1px solid #eeeeee; margin: 20px 0;" />
+          <p style="font-size: 12px; color: #777777; text-align: center;">This notification was automatically sent from your Prince Nexus Portfolio site.</p>
+        </div>
+      `,
     });
 
     return NextResponse.json(

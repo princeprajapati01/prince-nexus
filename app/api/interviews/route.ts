@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { sendEmail } from '@/lib/email';
 
 export async function POST(request: NextRequest) {
   try {
@@ -51,6 +52,55 @@ export async function POST(request: NextRequest) {
         type,
         message: message || null,
       },
+    });
+
+    // Send email notification
+    const formattedDate = parsedDate.toLocaleString('en-US', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      timeZoneName: 'short',
+    });
+
+    await sendEmail({
+      subject: `🗓️ New Interview Scheduled: ${name} (${company || 'No Company'})`,
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; rounded: 8px;">
+          <h2 style="color: #4f46e5; border-bottom: 2px solid #4f46e5; padding-bottom: 10px;">New Interview Request</h2>
+          <p>Hi Prince, someone has scheduled an interview with you from your portfolio site!</p>
+          <table style="width: 100%; border-collapse: collapse; margin-top: 15px;">
+            <tr>
+              <td style="padding: 8px 0; font-weight: bold; width: 120px;">Name:</td>
+              <td style="padding: 8px 0;">${name}</td>
+            </tr>
+            <tr>
+              <td style="padding: 8px 0; font-weight: bold;">Email:</td>
+              <td style="padding: 8px 0;"><a href="mailto:${email}">${email}</a></td>
+            </tr>
+            <tr>
+              <td style="padding: 8px 0; font-weight: bold;">Company:</td>
+              <td style="padding: 8px 0;">${company || 'Not Specified'}</td>
+            </tr>
+            <tr>
+              <td style="padding: 8px 0; font-weight: bold;">Date & Time:</td>
+              <td style="padding: 8px 0; color: #4f46e5; font-weight: bold;">${formattedDate}</td>
+            </tr>
+            <tr>
+              <td style="padding: 8px 0; font-weight: bold;">Type:</td>
+              <td style="padding: 8px 0;">${type}</td>
+            </tr>
+            <tr>
+              <td style="padding: 8px 0; font-weight: bold; vertical-align: top;">Message:</td>
+              <td style="padding: 8px 0; white-space: pre-line;">${message || 'No additional notes.'}</td>
+            </tr>
+          </table>
+          <hr style="border: 0; border-top: 1px solid #eeeeee; margin: 20px 0;" />
+          <p style="font-size: 12px; color: #777777; text-align: center;">This notification was automatically sent from your Prince Nexus Portfolio site.</p>
+        </div>
+      `,
     });
 
     return NextResponse.json(
